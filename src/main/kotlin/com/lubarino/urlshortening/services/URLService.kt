@@ -2,6 +2,7 @@ package com.lubarino.urlshortening.services
 
 import com.lubarino.urlshortening.domains.Url
 import com.lubarino.urlshortening.exceptions.AlreadyExistsException
+import com.lubarino.urlshortening.exceptions.URLNotFoundException
 import com.lubarino.urlshortening.generators.CharactersGenerator
 import com.lubarino.urlshortening.repositories.UrlRepository
 import org.springframework.stereotype.Service
@@ -43,7 +44,13 @@ class URLService(
     }
 
     override fun findURL(hash: String?, originalURL: String?) : String {
-        TODO("Not yet implemented")
+
+        require(hash != null && originalURL != null) {
+            "It's necessary send hash or original url"
+        }
+
+        val url = checkNotNull( urlRepository.findByHashOrOriginalUrl(hash, originalURL)) { throw URLNotFoundException() }
+        return url.hash
     }
 
     private fun existAlias(alias: String): Boolean {

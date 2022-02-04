@@ -52,6 +52,14 @@ class URLServiceTest {
         verify(urlRepository, times(1)).findByHashContaining(CUSTOM_ALIAS)
     }
 
+    @DisplayName("Should throw a error because the parameters are null")
+    @Test
+    fun findHashWithoutHashOrOriginalURL() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            urlService.findURL(null, null)
+        }
+    }
+
     companion object {
         const val FAKE_URL: String = "www.google.com"
         const val CUSTOM_ALIAS: String = "teste"
