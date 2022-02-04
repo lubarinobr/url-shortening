@@ -1,5 +1,6 @@
 package com.lubarino.urlshortening
 
+import com.lubarino.urlshortening.exceptions.AlreadyExistsException
 import com.lubarino.urlshortening.fixture.URLFixture.validURL
 import com.lubarino.urlshortening.repositories.UrlRepository
 import com.lubarino.urlshortening.services.URLService
@@ -43,11 +44,12 @@ class URLServiceTest {
 
     @DisplayName("Should throw a error if the alias already exists")
     @Test
-    fun errorWithAliasAlreadyExist() {
+    fun errorWithAliasThatAlreadyExist() {
         Mockito.`when`(urlRepository.findByHashContaining(CUSTOM_ALIAS)).thenReturn(null)
-        val createdURL = urlService.createURL(FAKE_URL, CUSTOM_ALIAS, null, null)
-        Assertions.assertTrue(createdURL.isNotBlank())
-        verify(urlRepository, times(0)).findByHashContaining(CUSTOM_ALIAS)
+        Assertions.assertThrows(AlreadyExistsException::class.java) {
+            urlService.createURL(FAKE_URL, CUSTOM_ALIAS, null, null)
+        }
+        verify(urlRepository, times(1)).findByHashContaining(CUSTOM_ALIAS)
     }
 
     companion object {
