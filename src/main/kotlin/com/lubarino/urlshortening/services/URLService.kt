@@ -6,6 +6,7 @@ import com.lubarino.urlshortening.exceptions.URLNotFoundException
 import com.lubarino.urlshortening.generators.CharactersGenerator
 import com.lubarino.urlshortening.repositories.UrlRepository
 import org.springframework.stereotype.Service
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 
 @Service
@@ -45,8 +46,8 @@ class URLService(
 
     override fun findURL(hash: String?, originalURL: String?) : String {
 
-        require(hash != null && originalURL != null) {
-            "It's necessary send hash or original url"
+        if(hash == null && originalURL == null) {
+            throw IllegalArgumentException("It's necessary send hash or original url")
         }
 
         val url = checkNotNull( urlRepository.findByHashOrOriginalUrl(hash, originalURL)) { throw URLNotFoundException() }

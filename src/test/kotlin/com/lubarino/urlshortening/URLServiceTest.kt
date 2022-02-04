@@ -1,6 +1,7 @@
 package com.lubarino.urlshortening
 
 import com.lubarino.urlshortening.exceptions.AlreadyExistsException
+import com.lubarino.urlshortening.exceptions.URLNotFoundException
 import com.lubarino.urlshortening.fixture.URLFixture.validURL
 import com.lubarino.urlshortening.repositories.UrlRepository
 import com.lubarino.urlshortening.services.URLService
@@ -60,9 +61,29 @@ class URLServiceTest {
         }
     }
 
+    @DisplayName("Should throw a error because there is not record in the database")
+    @Test
+    fun hashDoesNotExistInDatabase() {
+        Mockito.`when`(urlRepository.findByHashOrOriginalUrl(CUSTOM_HASH, null)).thenReturn(null)
+        Assertions.assertThrows(URLNotFoundException::class.java) {
+            urlService.findURL(CUSTOM_HASH, null)
+        }
+    }
+
+    @DisplayName("When the user tries to find a short url should return a valid hash")
+    @Test
+    fun hashExistsInDatabase() {
+        Mockito.`when`(urlRepository.findByHashOrOriginalUrl(CUSTOM_HASH, null)).thenReturn(validURL(BASE_URL, CUSTOM_ALIAS))
+        val url = urlService.findURL(CUSTOM_HASH, null)
+        Assertions.assertTrue(url.isNotBlank())
+        Assertions.assertEquals("""$BASE_URL$CUSTOM_ALIAS""", url)
+
+    }
+
     companion object {
         const val FAKE_URL: String = "www.google.com"
         const val CUSTOM_ALIAS: String = "teste"
         const val BASE_URL = "http://shorturl.by/"
+        const val CUSTOM_HASH = """$BASE_URL$CUSTOM_ALIAS"""
     }
 }

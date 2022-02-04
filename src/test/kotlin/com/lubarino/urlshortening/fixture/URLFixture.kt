@@ -10,6 +10,6 @@ object URLFixture {
         expirationDate = LocalDateTime.MAX,
         userId = null
     ).apply {
-        this.hash = """$url/$alias"""
+        this.hash = """$url$alias"""
     }
 }
